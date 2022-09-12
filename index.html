@@ -1,79 +1,226 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Whatsapp API by Ngekoding</title>
+	<title>Whatsapp API</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- This parts is optional, just for improve the styles -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Montserrat', sans-serif;
-      padding: 20px;
-    }
-    #app {
-      max-width: 500px;
-      margin: 20px auto;
-    }
-    #qrcode {
-      display: none; /* Showed when qr code received */
-      width: 100%;
-      margin: 10px 0;
-      border: 1px solid #efefef;
-      border-radius: 4px;
-    }
-    ul.logs {
-      max-height: 150px;
-      padding: 15px 15px 15px 30px;
-      margin-top: 5px;
-      border-radius: 4px;
-      overflow-y: auto;
-      background: #efefef;
-      color: #666;
-      font-size: 14px;
-    }
-    ul.logs li:first-child {
-      color: green;
-    }
-  </style>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/smooth-scrollbar/5.0.1/smooth-scrollbar.css" integrity="sha512-QyDQGQiuKrcAtAIPIaO+IBZNkmb/+U5dyMY2Qe64mhjKiF74QWuDhjrqgkbacfQqqFB2+fwWnan5TQHlb0mfUg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="/css/style.css" rel="stylesheet">
 </head>
 <body>
 
 	<div id="app">
-		<h1>Whatsapp API</h1>
-		<p>Powered by Ngekoding</p>
-		<img src="" alt="QR Code" id="qrcode">
-		<h3>Logs:</h3>
-		<ul class="logs"></ul>
-	</div>
+        <div class="container frame-chat">
+            <div class="row">
+                <div class="col-3 sidebar-chat area-kontak">
+                    <img src="" alt="QR Code" id="qrcode">
+                    <input id="search" class="form-control mb-2">
+                    <ul class="list-group chat">
+                    </ul>
+                </div>
+                <div class="col">
+                    
+                    <div class="max-height-70vh chat-cols">
+                        <div id="chatarea">
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
+                        </div>
+                        <div id="endchat"></div>
+                    </div>
+                    <div class="max-height-20vh">
+                        <form class="kirim-chat">
+                            <textarea class="body-message form-control mb-2" placeholder=""></textarea>
+                            <button class="btn btn-success ms-auto me-0">Kirim</button>
+                        </form>
+                    </div>
+                    <ul class="list-group logs d-none">
+                    </ul>
+                </div>
+            </div>
+        </div>
+		
+		
+	</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/smooth-scrollbar/5.0.1/smooth-scrollbar.js" integrity="sha512-fNprFnoeUomE0+m0nYtgoIrlUm81yW4dtuBVhMluVYlbpYEGMfEbUJJN4muTYiltfmDyWkQ5TpmwmIhdFK7qEA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js" integrity="sha512-CryKbMe7sjSCDPl18jtJI5DR5jtkUWxPXWaLCst6QjH8wxDexfRJic2WRmRXmstr2Y8SxDDWuBO6CQC6IE4KTA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js" integrity="sha512-42PE0rd+wZ2hNXftlM78BSehIGzezNeQuzihiBCvUEB3CVxHvsShF86wBWwQORNxNINlBPuq7rG4WWhNiTVHFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js" integrity="sha512-he8U4ic6kf3kustvJfiERUpojM8barHoz0WYpAUDWQVn61efpm3aVAD8RWL8OloaDDzMZ1gZiubF9OSdYBqHfQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js" crossorigin="anonymous"></script>
 	<script>
-		$(document).ready(function() {
-			var socket = io();
 
-			socket.on('message', function(msg) {
-				$('.logs').prepend($('<li>').text(msg));
-			});
+        let Scrollbar = window.Scrollbar;
 
-			socket.on('qr', function(src) {
-				$('#qrcode').attr('src', src);
-				$('#qrcode').show();
-			});
+        Scrollbar.init(document.querySelector('.area-kontak'));
+        Scrollbar.init(document.querySelector('.max-height-70vh'),{
+            alwaysShowTracks: true
+        });
+        // Scrollbar.init(document.querySelector('.max-height-20vh'));
 
-			socket.on('ready', function(data) {
-				$('#qrcode').hide();
-			});
+            
 
-			socket.on('authenticated', function(data) {
-				$('#qrcode').hide();
-			});
-		});
+        function getExtByMime(mime) {
+            var mimeToExt = {
+                'image/jpeg': 'jpeg',
+                'image/png': 'png',
+                'image/webp': 'webp',
+                'video/mp4' : 'mp4',
+                'audio/ogg' : 'oga',
+                'audio/ogg; codecs=opus' : 'oga'
+            }
+            if (mimeToExt.hasOwnProperty(mime)) {
+                return mimeToExt[mime];
+            }
+            return false;
+        }
+
+		(function($) {
+            $(document).ready(function() {
+                const socket = io();
+                const localNumber = localStorage.getItem('number');
+
+                // $("#search").on("keyup", function() {
+                $(document).on("keyup","#search",function() {
+                    var value = $(this).val();
+                    $('.card').removeClass('d-none');
+                    var filter = $(this).val(); // get the value of the input, which we filter on
+                    $('.chat').find('ul li div .fw-bold:not(:contains("'+filter+'"))').parent().parent().addClass('d-none');
+                });
+
+                $(".kirim-chat .body-message").attr("placeholder", "Pesan akan dikirim ke "+localNumber);
+                if(localNumber){
+                    socket.emit('getchatbyid', localNumber);
+                }
+                $(document).on("click",".list-contact",function() {
+                    $('.list-contact').removeClass('active');
+                    $( this ).addClass('active');
+                    let id = $( this ).data('id');
+                    // console.log(id);
+                    // getchatbyid
+                    socket.emit('getchatbyid', id);
+                    localStorage.setItem('number', id);
+                    $(".kirim-chat .body-message").val('');
+                    $(".kirim-chat .body-message").attr("placeholder", "Pesan akan dikirim ke "+id);
+                });
+
+
+                $( ".kirim-chat" ).submit(function( event ) {                   
+                    let message = $(this).find(".body-message").val();
+                    let localNumber =localStorage.getItem('number'); 
+                    socket.emit('sentMessage', {'nomor':localNumber,'message':message});
+                    $(".kirim-chat .body-message").val('');
+                    event.preventDefault();
+                });
+
+                
+                // socket.on("connect", () => {
+                //     console.log(socket); // x8WIv7-mJelg7on_ALbx
+                // });
+                socket.emit('client request', 'request Data Kontak');
+
+                socket.on('message', function(msg) {
+                    $('.logs').prepend($('<li class="list-group-item">').text(msg));
+                });
+
+                socket.on('getContact', function(data) {
+                    $('.chat').html('');
+                    console.log('listchat soket update');
+                    const dataListChat = data.sort();
+                    // const dataListChat = data.sort((a, b) => b.unreadCount > a.unreadCount);
+                    // dataListChat.sort((a, b));
+
+                    // console.log(dataListChat);
+                    var arrayLength = dataListChat.length;
+                    for (var i = 0; i < arrayLength; i++) {
+                        let dataContact = dataListChat[i]?.data;
+                        // console.log(dataContact?.data?.name);
+                        //Do something
+                        let contact = `<div class="ms-2 me-auto">
+                            <div class="fw-bold">`+dataContact.name+`</div>`;
+                            contact +=`<div style="font-size:8px;">`+moment.unix(dataContact.timestamp).format("DD-MM h:mm:ss")+`</div>`;
+                            contact +=`</div>`;
+                            if(dataContact.unreadCount < 0){
+                                contact +=`<span class="badge bg-info rounded-pill"> </span>`;
+                            } else if (dataContact.unreadCount >= 1) {
+                                contact +=`<span class="badge bg-success rounded-pill">`+dataContact.unreadCount+`</span>`;
+                            }
+                            
+                        $('.chat').append($('<li class="list-contact list-'+dataContact.id+' list-group-item d-flex justify-content-between align-items-start" data-id="'+dataContact.id+'"></li>')
+                        .html(contact));
+                    }
+                    if(localNumber){
+                        $('.list-'+localNumber).addClass( "active" );
+                    }
+                });
+
+                socket.on('chatmasuk', function(data) {
+                    socket.emit('getchatbyid', localNumber);
+                });
+
+                socket.on('kirim chat sukses', function(data) {
+                    console.log(data);
+                    if(localNumber == data) {
+                        socket.emit('getchatbyid', localNumber);
+                        $(".body-message").val('');
+                    }
+                    
+                });
+
+                socket.on('chat by number', function(data) {
+                    // console.log(data);
+
+                    html = '';
+                    for (var i = 0, l = data.length; i < l; i++) {
+                        const value = data[i];
+                        console.log(value);
+                        let divClass = value.fromMe == true ? 'chat-to' : 'chat-from';
+                        html += '<div class="'+divClass+'"><span>';
+                        
+                        // console.log(value);
+                        // console.log(array);
+                        if (value.hasMedia) {
+                            // console.log(value);
+                            if(getExtByMime(value._data.mimetype) == 'mp4'){
+                                html += '<video width="100%" height="auto" controls><source src="/img/'+ value.id.id + '.'+getExtByMime(value._data.mimetype)+'" type="video/mp4"></span>';
+                            } else if(getExtByMime(value._data.mimetype) == 'oga'){
+                                html += '<audio width="100%" height="auto" controls><source src="/img/'+ value.id.id + '.'+getExtByMime(value._data.mimetype)+'" type="video/mp4"></span>';
+                            } else {
+                                html += '<img class="img-fluid" src="/img/'+ value.id.id + '.'+getExtByMime(value._data.mimetype)+'" alt="'+ value.id.id + '">';
+                            }
+                        } else {
+                            html += value.body;
+                        }
+                        html += '<div><small>'+ moment.unix(value.timestamp).format("DD-MM-YYYY h:mm:ss") + "</small></div>";
+                        html += '</span></div>';
+                    }
+                    document.getElementById('chatarea').innerHTML = html;
+                    setTimeout(function(){
+                        // $(".chat-cols").animate({ scrollTop: $('#chatarea').prop("scrollHeight")}, 100);
+                        $(".chat-cols").animate({
+                            scrollTop: $("#endchat").offset().top
+                        }, 100);
+                    }, 3000);
+                });
+
+                socket.on('qr', function(src) {
+                    $('#qrcode').attr('src', src);
+                    $('#qrcode').show();
+                });
+
+                socket.on('ready', function(data) {
+                    $('#qrcode').hide();
+                    console.log(data);
+                });
+
+                socket.on('authenticated', function(data) {
+                    $('#qrcode').hide();
+                });
+                socket.on('log', function(data) {
+                    console.log(data);
+                });
+            });
+        })(jQuery);
 	</script>
 </body>
 </html>

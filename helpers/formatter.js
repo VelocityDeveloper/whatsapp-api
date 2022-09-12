@@ -1,6 +1,6 @@
 const phoneNumberFormatter = function(number) {
   // 1. Menghilangkan karakter selain angka
-  let formatted = number.replace(/\D/g, '');
+  let formatted = number.toString().replace(/\D/g, '');
 
   // 2. Menghilangkan angka 0 di depan (prefix)
   //    Kemudian diganti dengan 62

@@ -1,0 +1,78 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Montserrat', sans-serif;
+  padding: 20px;
+}
+.sidebar-chat {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+#chatarea {
+  padding: 20px;
+}
+#qrcode {
+  display: none; /* Showed when qr code received */
+  width: 100%;
+  margin: 10px 0;
+  border: 1px solid #efefef;
+  border-radius: 4px;
+}
+.chat-from,
+.chat-to {
+  color: #fff;
+  padding: 10px 0;
+}
+.chat-from {
+  text-align: left;
+}
+.chat-to {
+  text-align: right;
+}
+.chat-from span,
+.chat-to span{
+  padding: 10px;
+  border-radius: 20px;
+  display: inline-block;
+  max-width:80%;
+}
+.chat-from span {
+  background-color: rgb(62, 142, 218);
+}
+.chat-to span {
+  background-color: rgb(175, 86, 216);
+
+}
+ul.logs {
+  max-height: 300px;
+  padding: 15px 15px 15px 30px;
+  margin-top: 5px;
+  border-radius: 4px;
+  overflow-y: hidden;
+  background: #efefef;
+  color: #666;
+  font-size: 14px;
+}
+ul.logs li:first-child {
+  color: green;
+}
+.frame-chat {
+  padding: 20px;
+  background-color:#333;
+  border-radius: 10px;
+}
+.max-height-70vh {
+    height: 55vh;
+    overflow-y: auto;
+    background-color: #222;
+    border-radius: 10px;
+}
+.max-height-20vh {
+    background-color: #222;
+    border-radius: 10px;
+    padding:10px;
+    margin-top: 2vh;
+}
