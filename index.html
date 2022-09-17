@@ -51,14 +51,17 @@
 	<script>
 
         let Scrollbar = window.Scrollbar;
+        var options = {
+            alwaysShowTracks : true
+        };
 
         Scrollbar.init(document.querySelector('.area-kontak'));
-        Scrollbar.init(document.querySelector('.max-height-70vh'),{
-            alwaysShowTracks: true
+        // Scrollbar.init(document.querySelector('.max-height-70vh'),options);
+        const chatScrollbar = Scrollbar.init(document.querySelector('.max-height-70vh'), {
+        damping: 0.2,
+        alwaysShowTracks : true
         });
-        // Scrollbar.init(document.querySelector('.max-height-20vh'));
-
-            
+        // Scrollbar.init(document.querySelector('.max-height-20vh'))
 
         function getExtByMime(mime) {
             var mimeToExt = {
@@ -67,7 +70,79 @@
                 'image/webp': 'webp',
                 'video/mp4' : 'mp4',
                 'audio/ogg' : 'oga',
-                'audio/ogg; codecs=opus' : 'oga'
+                'audio/ogg; codecs=opus' : 'oga',
+                'audio/aac' : 'aac',
+                'application/x-abiword' : 'abw',
+                'application/x-freearc' : 'arc',
+                'image/avif' : 'avif',
+                'video/x-msvideo' : 'avi',
+                'application/vnd.amazon.ebook' : 'azw',
+                'application/octet-stream' : 'bin',
+                'image/bmp' : 'bmp',
+                'application/x-bzip' : 'bz',
+                'application/x-bzip2' : 'bz2',
+                'application/x-cdf' : 'cda',
+                'application/x-csh' : 'csh',
+                'text/css' : 'css',
+                'text/csv' : 'csv',
+                'application/msword' : 'doc',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'docx',
+                'application/vnd.ms-fontobject' : 'eot',
+                'application/epub+zip' : 'epub',
+                'application/gzip' : 'gz',
+                'image/gif' : 'gif',
+                'text/html' : 'htm .html',
+                'image/vnd.microsoft.icon' : 'ico',
+                'text/calendar' : 'ics',
+                'application/java-archive' : 'jar',
+                'image/jpeg' : 'jpeg.jpg',
+                'text/javascript' : 'js',
+                'application/json' : 'json',
+                'application/ld+json' : 'jsonld',
+                'audio/midi' : '.midi',
+                'text/javascript' : 'mjs',
+                'audio/mpeg' : 'mp3',
+                'video/mp4' : 'mp4',
+                'video/mpeg' : 'mpeg',
+                'application/vnd.apple.installer+xml' : 'mpkg',
+                'application/vnd.oasis.opendocument.presentation' : 'odp',
+                'application/vnd.oasis.opendocument.spreadsheet' : 'ods',
+                'application/vnd.oasis.opendocument.text' : 'odt',
+                'audio/ogg' : 'oga',
+                'video/ogg' : 'ogv',
+                'application/ogg' : 'ogx',
+                'audio/opus' : 'opus',
+                'font/otf' : 'otf',
+                'image/png' : 'png',
+                'application/pdf' : 'pdf',
+                'application/x-httpd-php' : 'php',
+                'application/vnd.ms-powerpoint' : 'ppt',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation' : 'pptx',
+                'application/vnd.rar' : 'rar',
+                'application/rtf' : 'rtf',
+                'application/x-sh' : 'sh',
+                'image/svg+xml' : 'svg',
+                'application/x-tar' : 'tar',
+                'image/tiff' : 'tif .tiff',
+                'video/mp2t' : 'ts',
+                'font/ttf' : 'ttf',
+                'text/plain' : 'txt',
+                'application/vnd.visio' : 'vsd',
+                'audio/wav' : 'wav',
+                'audio/webm' : 'weba',
+                'video/webm' : 'webm',
+                'image/webp' : 'webp',
+                'font/woff' : 'woff',
+                'font/woff2' : 'woff2',
+                'application/xhtml+xml' : 'xhtml',
+                'application/vnd.ms-excel' : 'xls',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'xlsx',
+                'application/xml' : 'xml',
+                'application/vnd.mozilla.xul+xml' : 'xul',
+                'application/zip' : 'zip',
+                'video/3gpp' : '3gp',
+                'video/3gpp2' : '3g2',
+                'application/x-7z-compressed' : '7z',
             }
             if (mimeToExt.hasOwnProperty(mime)) {
                 return mimeToExt[mime];
@@ -89,6 +164,9 @@
                 });
 
                 $(".kirim-chat .body-message").attr("placeholder", "Pesan akan dikirim ke "+localNumber);
+
+                // init kontak
+                socket.emit('updateDataContact', 'request Data Kontak');
                 if(localNumber){
                     socket.emit('getchatbyid', localNumber);
                 }
@@ -113,12 +191,6 @@
                     event.preventDefault();
                 });
 
-                
-                // socket.on("connect", () => {
-                //     console.log(socket); // x8WIv7-mJelg7on_ALbx
-                // });
-                socket.emit('client request', 'request Data Kontak');
-
                 socket.on('message', function(msg) {
                     $('.logs').prepend($('<li class="list-group-item">').text(msg));
                 });
@@ -138,10 +210,10 @@
                         //Do something
                         let contact = `<div class="ms-2 me-auto">
                             <div class="fw-bold">`+dataContact.name+`</div>`;
-                            contact +=`<div style="font-size:8px;">`+moment.unix(dataContact.timestamp).format("DD-MM h:mm:ss")+`</div>`;
+                            contact +=`<div style="font-size:8px;">`+moment.unix(dataContact.timestamp).format("DD-MM-YYYY h:mm:ss")+`</div>`;
                             contact +=`</div>`;
                             if(dataContact.unreadCount < 0){
-                                contact +=`<span class="badge bg-info rounded-pill"> </span>`;
+                                contact +=`<span class="badge bg-success rounded-pill text-success">!</span>`;
                             } else if (dataContact.unreadCount >= 1) {
                                 contact +=`<span class="badge bg-success rounded-pill">`+dataContact.unreadCount+`</span>`;
                             }
@@ -160,6 +232,11 @@
 
                 socket.on('kirim chat sukses', function(data) {
                     console.log(data);
+                    
+                    setTimeout(function(){
+                        socket.emit('updateDataContact', 'request Data Kontak');
+                    }, 100);
+
                     if(localNumber == data) {
                         socket.emit('getchatbyid', localNumber);
                         $(".body-message").val('');
@@ -173,7 +250,7 @@
                     html = '';
                     for (var i = 0, l = data.length; i < l; i++) {
                         const value = data[i];
-                        console.log(value);
+                        // console.log(value);
                         let divClass = value.fromMe == true ? 'chat-to' : 'chat-from';
                         html += '<div class="'+divClass+'"><span>';
                         
@@ -194,13 +271,15 @@
                         html += '<div><small>'+ moment.unix(value.timestamp).format("DD-MM-YYYY h:mm:ss") + "</small></div>";
                         html += '</span></div>';
                     }
-                    document.getElementById('chatarea').innerHTML = html;
-                    setTimeout(function(){
-                        // $(".chat-cols").animate({ scrollTop: $('#chatarea').prop("scrollHeight")}, 100);
-                        $(".chat-cols").animate({
-                            scrollTop: $("#endchat").offset().top
-                        }, 100);
-                    }, 3000);
+                    $('#chatarea').html(html);
+                    setTimeout(function() {
+                        let tinggiChat = $('#chatarea').height();
+                        chatScrollbar.scrollTo(0, tinggiChat, 0, {
+                            // callback: () => console.log(chatScrollbar.offset)
+                        });
+                    }, 1000);
+
+
                 });
 
                 socket.on('qr', function(src) {
