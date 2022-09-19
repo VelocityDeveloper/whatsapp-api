@@ -38,6 +38,7 @@ body {
   border-radius: 20px;
   display: inline-block;
   max-width:80%;
+  overflow-wrap: anywhere;
 }
 .chat-from span {
   background-color: rgb(62, 142, 218);

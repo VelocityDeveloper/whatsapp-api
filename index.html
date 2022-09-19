@@ -157,9 +157,18 @@
                 // $("#search").on("keyup", function() {
                 $(document).on("keyup","#search",function() {
                     var value = $(this).val();
-                    $('.card').removeClass('d-none');
+                    $('.list-contact').removeClass('d-none');
                     var filter = $(this).val(); // get the value of the input, which we filter on
-                    $('.chat').find('ul li div .fw-bold:not(:contains("'+filter+'"))').parent().parent().addClass('d-none');
+                    if(value.length > 1){
+                        $('.list-contact').addClass('d-none');
+                        $('.list-contact').each(function(i, obj) {
+                            console.log($(this).indexOf( '"'+filter+'"' ));
+                            if($(this).attr('class').includes( '"'+filter+'"' )){
+                                $(this).addClass('d-block')
+                            }
+                        });
+                        
+                    }
                 });
 
                 $(".kirim-chat .body-message").attr("placeholder", "Pesan akan dikirim ke "+localNumber);
@@ -208,7 +217,7 @@
                         // console.log(dataContact?.data?.name);
                         //Do something
                         let contact = `<div class="ms-2 me-auto">
-                            <div class="fw-bold">`+dataContact.name+`</div>`;
+                            <div class="fw-bold data-nama">`+dataContact.name+`</div>`;
                             contact +=`<div style="font-size:8px;">`+moment.unix(dataContact.timestamp).format("DD-MM-YYYY h:mm:ss")+`</div>`;
                             contact +=`</div>`;
                             if(dataContact.unreadCount < 0){
