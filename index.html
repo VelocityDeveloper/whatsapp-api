@@ -91,11 +91,10 @@
                 'application/epub+zip' : 'epub',
                 'application/gzip' : 'gz',
                 'image/gif' : 'gif',
-                'text/html' : 'htm .html',
+                'text/html' : 'html',
                 'image/vnd.microsoft.icon' : 'ico',
                 'text/calendar' : 'ics',
                 'application/java-archive' : 'jar',
-                'image/jpeg' : 'jpeg.jpg',
                 'text/javascript' : 'js',
                 'application/json' : 'json',
                 'application/ld+json' : 'jsonld',
@@ -123,7 +122,7 @@
                 'application/x-sh' : 'sh',
                 'image/svg+xml' : 'svg',
                 'application/x-tar' : 'tar',
-                'image/tiff' : 'tif .tiff',
+                'image/tiff' : 'tiff',
                 'video/mp2t' : 'ts',
                 'font/ttf' : 'ttf',
                 'text/plain' : 'txt',
@@ -289,7 +288,6 @@
 
                 socket.on('ready', function(data) {
                     $('#qrcode').hide();
-                    console.log(data);
                 });
 
                 socket.on('authenticated', function(data) {

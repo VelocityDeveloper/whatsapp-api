@@ -183,10 +183,6 @@ io.on('connection', function (socket) {
 
     client.on('ready', async function () {
         console.log('client ready');
-        let isChatIn = await contactInit();
-        socket.emit('getContact', isChatIn);
-        console.log('sinkronkan kontak akses pertama');
-        
     });
 
     client.on('message', async function () {
