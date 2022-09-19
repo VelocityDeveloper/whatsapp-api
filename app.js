@@ -152,7 +152,6 @@ client.initialize();
 io.on('connection', function (socket) {
 
     socket.emit('message', 'Menghububugkan...');
-
     // const allChats = client.getChats();
     // socket.emit('getContact', client.getChats());
 
@@ -192,10 +191,15 @@ io.on('connection', function (socket) {
     });
 
     socket.on('updateDataContact', async function(msg) {
-        let isChatIn = await contactInit();
-        socket.emit('getContact', isChatIn);
-        console.log('sinkronkan kontak karena chat masuk');
-        console.log(msg);
+        if(client.info.wid.user){
+            let isChatIn = await contactInit();
+            socket.emit('getContact', isChatIn);
+            console.log('sinkronkan kontak karena chat masuk');
+            console.log(msg);
+        } else {
+            socket.emit('getContact', 'not ready yet!');
+            console.log('Client belum siap!');
+        }
     });
 
     socket.on('sentMessage', async function(data){
