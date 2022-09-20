@@ -1,5 +1,5 @@
 node_modules
 whatsapp-session*.json
 package-lock.json
-public/img
+public/img-download
 .wwebjs_auth

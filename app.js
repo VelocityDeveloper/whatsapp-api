@@ -118,7 +118,7 @@ client.on('message', msg => {
     //     if (media) {
     //       // The folder to store: change as you want!
     //       // Create if not exists
-    //       const mediaPath = './public/img/';
+    //       const mediaPath = './public/img-download/';
 
     //       if (!fs.existsSync(mediaPath)) {
     //         fs.mkdirSync(mediaPath);
@@ -259,7 +259,7 @@ const getDataChat = async function (value, index, array) {
           if (media) {
             // The folder to store: change as you want!
             // Create if not exists
-            const mediaPath = './public/img/';
+            const mediaPath = './public/img-download/';
   
             if (!fs.existsSync(mediaPath)) {
               fs.mkdirSync(mediaPath, {recursive: true}, err => {});
