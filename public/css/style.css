@@ -4,15 +4,26 @@
   box-sizing: border-box;
 }
 body {
-  font-family: 'Montserrat', sans-serif;
-  padding: 20px;
+  font-family: 'Poppins', sans-serif;
 }
 .sidebar-chat {
-  max-height: 65vh;
+  max-height: 100vh;
   overflow-y: auto;
+  padding-top: 58px;
 }
-#chatarea {
-  padding: 20px;
+.chatarea {
+  padding: 0 10px 120px 10px;
+}
+.frame-chat {
+  background-color: #202C33;
+}
+.search-form {
+  position: absolute;
+  top: 0px;
+  z-index: 99;
+  padding: 10px;
+  background-color: #111B21;
+  width: 100%;
 }
 #qrcode {
   display: none; /* Showed when qr code received */
@@ -33,12 +44,17 @@ body {
   text-align: right;
 }
 .chat-from span,
-.chat-to span{
+.chat-to span {
   padding: 10px;
   border-radius: 20px;
   display: inline-block;
   max-width:80%;
   overflow-wrap: anywhere;
+}
+.chat-from span img,
+.chat-to span img {
+
+  max-width:300px;
 }
 .chat-from span {
   background-color: rgb(62, 142, 218);
@@ -64,23 +80,24 @@ ul.logs li:first-child {
   color: green;
 }
 .frame-chat {
-  padding: 20px;
-  background-color:#333;
-  border-radius: 10px;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
 }
 .area-pesan {
-    height: 55vh;
+    height: 100vh;
     overflow-y: auto;
     background-color: #222;
     border-radius: 10px;
 }
-.max-height-20vh {
-    background-color: #222;
-    border-radius: 10px;
+.fixed-chatform {
     padding:10px;
     margin-top: 2vh;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
 }
 .data-nama {
   font-size: 14px;
-  font-weight: bold;
 }
