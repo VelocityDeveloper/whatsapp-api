@@ -14,11 +14,12 @@
 	<div id="app">
         <div class="container frame-chat">
             <div class="row">
-                <div class="col-3 sidebar-chat area-kontak">
+                <div class="col-3">
                     <img src="" alt="QR Code" id="qrcode">
-                    <input id="search" class="form-control mb-2">
-                    <ul class="list-group chat">
-                    </ul>
+                    <input id="search" class="form-control mb-2" placeholder="Cari kontak..">
+                    <div class="sidebar-chat sidebar-chat area-kontak">
+                        <ul class="list-group chat"></ul>
+                    </div>
                 </div>
                 <div class="col">
                     
@@ -158,13 +159,12 @@
                 $(document).on("keyup","#search",function() {
                     var value = $(this).val();
                     $('.list-contact').removeClass('d-none');
-                    var filter = $(this).val(); // get the value of the input, which we filter on
+                    var filter = $(this).val().toLowerCase(); // get the value of the input, which we filter on
                     if(value.length > 1){
-                        $('.list-contact').addClass('d-none');
                         $('.list-contact').each(function(i, obj) {
-                            console.log($(this).indexOf( '"'+filter+'"' ));
-                            if($(this).attr('class').includes( '"'+filter+'"' )){
-                                $(this).addClass('d-block')
+                            $(this).addClass('d-none');
+                            if($(this).attr('class').toString().indexOf(filter) > 1) {
+                                $(this).removeClass('d-none');
                             }
                         });
                         
@@ -214,7 +214,7 @@
                     var arrayLength = dataListChat.length;
                     for (var i = 0; i < arrayLength; i++) {
                         let dataContact = dataListChat[i]?.data;
-                        // console.log(dataContact?.data?.name);
+                        console.log(dataContact);
                         //Do something
                         let contact = `<div class="ms-2 me-auto">
                             <div class="fw-bold data-nama">`+dataContact.name+`</div>`;
@@ -226,7 +226,7 @@
                                 contact +=`<span class="badge bg-success rounded-pill">`+dataContact.unreadCount+`</span>`;
                             }
                             
-                        $('.chat').append($('<li class="list-contact list-'+dataContact.id+' list-group-item d-flex justify-content-between align-items-start" data-id="'+dataContact.id+'"></li>')
+                        $('.chat').append($('<li class="list-contact list-'+dataContact.id+' '+dataContact.name.toLowerCase()+' list-group-item d-flex justify-content-between align-items-start" data-id="'+dataContact.id+'"></li>')
                         .html(contact));
                     }
                     if(localNumber){
