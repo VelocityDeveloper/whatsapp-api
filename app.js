@@ -191,7 +191,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('updateDataContact', async function(msg) {
-        if(client.info.wid.user){
+        if(client){
             let isChatIn = await contactInit();
             socket.emit('getContact', isChatIn);
             console.log('sinkronkan kontak karena chat masuk');
@@ -203,22 +203,30 @@ io.on('connection', function (socket) {
     });
 
     socket.on('sentMessage', async function(data){
-        console.log(data);
-        const number = phoneNumberFormatter(data.nomor);
-        const message = data.message;
-    
-        const isRegisteredNumber = await checkRegisteredNumber(number);
-    
-        if (!isRegisteredNumber) {
-            socket.emit('log', 'nomor tidak terdaftar');
-        }
-
+        if(client){
+            console.log(data);
+            const number = phoneNumberFormatter(data.nomor);
+            const message = data.message;
         
-        client.sendMessage(number, message).then(response => {
-            socket.emit('kirim chat sukses', data.nomor);            
-        }).catch(err => {
-            socket.emit('log', err);
-        });
+            const isRegisteredNumber = await checkRegisteredNumber(number);
+        
+            if (!isRegisteredNumber) {
+                socket.emit('log', 'nomor tidak terdaftar');
+            }
+
+            
+            client.sendMessage(number, message).then(response => {
+                socket.emit('kirim chat sukses', data.nomor);            
+            }).catch(err => {
+                socket.emit('log', err);
+            });
+        }
+    });
+    socket.on('reqPicUrl', async function(data){
+        if(client){
+            let pic = await client.getProfilePicUrl(data);
+            socket.emit('getPicUrl', [data, pic]);  
+        }
     });
 
     socket.on('getchatbyid', async function(msg) {
@@ -282,34 +290,25 @@ const contactInit = async function () {
     console.log('mendapatkan list chat');
     const allChats = await client.getChats();
     const obj = [];
-    console.log(allChats[0]);
     
+    // console.log(allChats[0]);
     for (var i = 0, l = allChats.length; i < l; i++) {
-        // const number = phoneNumberFormatter(allChats[i]?.id?.user.replace(/[^0-9]/g, '')) || 0;
-        //  
-         if(allChats[i]?.id?.user.includes("-") == false){
-            // let chat = await client.getChatById(number);
-            // console.log(allChats[i]);
-            // chat.fetchMessages({limit:1}).then(messages => {
-            //     let firstMessages = messages[0];
-            //     let fTime = firstMessages?.timestamp || 0;
-            //     let fId  = firstMessages?.id?.id || 0;
-            //     // console.log(i);
-                obj.push({
-                    'data':{
-                        'name' : allChats[i]?.name,
-                        'id' : allChats[i]?.id?.user,
-                        'unreadCount' :allChats[i]?.unreadCount,
-                        // 'caption' : firstMessages?.caption,
-                        // 'body': firstMessages?.body,
-                        'timestamp':allChats[i]?.timestamp
-                    }
-                });
-            // });
-         }
+        if(allChats[i]?.id?.user.includes("-") == false){
+
+            // console.log(pic);
+            obj.push({
+                'data':{
+                    'name' : allChats[i]?.name,
+                    'id' : allChats[i]?.id?._serialized,
+                    'nomor' : allChats[i]?.id?.user,
+                    'unreadCount' :allChats[i]?.unreadCount,
+                    'timestamp':allChats[i]?.timestamp
+                }
+            });
+        }
     }
-    // console.log(obj);
     return obj;
+    
 }
 const checkRegisteredNumber = async function (number) {
     const isRegistered = await client.isRegisteredUser(number);

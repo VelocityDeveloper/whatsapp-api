@@ -8,7 +8,7 @@ body {
   padding: 20px;
 }
 .sidebar-chat {
-  max-height: 80vh;
+  max-height: 65vh;
   overflow-y: auto;
 }
 #chatarea {
@@ -57,6 +57,9 @@ ul.logs {
   color: #666;
   font-size: 14px;
 }
+.list-contact {
+  cursor: pointer;
+}
 ul.logs li:first-child {
   color: green;
 }
@@ -65,7 +68,7 @@ ul.logs li:first-child {
   background-color:#333;
   border-radius: 10px;
 }
-.max-height-70vh {
+.area-pesan {
     height: 55vh;
     overflow-y: auto;
     background-color: #222;

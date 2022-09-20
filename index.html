@@ -16,14 +16,14 @@
             <div class="row">
                 <div class="col-3">
                     <img src="" alt="QR Code" id="qrcode">
-                    <input id="search" class="form-control mb-2" placeholder="Cari kontak..">
+                    <input id="search" class="form-control mb-2" placeholder="Search Contact..">
                     <div class="sidebar-chat sidebar-chat area-kontak">
                         <ul class="list-group chat"></ul>
                     </div>
                 </div>
                 <div class="col">
                     
-                    <div class="max-height-70vh chat-cols">
+                    <div class="area-pesan chat-cols">
                         <div id="chatarea">
 
                         </div>
@@ -57,8 +57,8 @@
         };
 
         Scrollbar.init(document.querySelector('.area-kontak'));
-        // Scrollbar.init(document.querySelector('.max-height-70vh'),options);
-        const chatScrollbar = Scrollbar.init(document.querySelector('.max-height-70vh'), {
+        // Scrollbar.init(document.querySelector('.area-pesan'),options);
+        const chatScrollbar = Scrollbar.init(document.querySelector('.area-pesan'), {
         damping: 0.2,
         alwaysShowTracks : true
         });
@@ -182,7 +182,6 @@
                     $('.list-contact').removeClass('active');
                     $( this ).addClass('active');
                     let id = $( this ).data('id');
-                    // console.log(id);
                     // getchatbyid
                     socket.emit('getchatbyid', id);
                     localStorage.setItem('number', id);
@@ -203,28 +202,38 @@
                     $('.logs').prepend($('<li class="list-group-item">').text(msg));
                 });
 
+                socket.on('getPicUrl', function(msg) {
+                    $(`[data-user='`+msg[0]+`']`).attr("src", msg[1]);
+                });
+
                 socket.on('getContact', function(data) {
                     $('.chat').html('');
-                    console.log('listchat soket update');
                     const dataListChat = data.sort();
-                    // const dataListChat = data.sort((a, b) => b.unreadCount > a.unreadCount);
                     // dataListChat.sort((a, b));
 
-                    // console.log(dataListChat);
                     var arrayLength = dataListChat.length;
                     for (var i = 0; i < arrayLength; i++) {
                         let dataContact = dataListChat[i]?.data;
                         console.log(dataContact);
+                        socket.emit('reqPicUrl', dataContact.id);
                         //Do something
-                        let contact = `<div class="ms-2 me-auto">
-                            <div class="fw-bold data-nama">`+dataContact.name+`</div>`;
-                            contact +=`<div style="font-size:8px;">`+moment.unix(dataContact.timestamp).format("DD-MM-YYYY h:mm:ss")+`</div>`;
+                        let contact = ``
+                            contact +=`<div class="row">`;
+                                contact +=`<div class="col-2 px-0">`;
+                                    contact +=`<img class="rounded-circle img-fluid" data-user="`+dataContact.id+`" src="" alt="">`;
+                                contact +=`</div>`;
+                                contact +=`<div class="col-10">`;
+                                    contact +=`<div class="ms-2 me-auto">
+                                    <div class="data-nama">`+dataContact.name+`</div>`;
+                                    contact +=`<div style="font-size:8px;">`+moment.unix(dataContact.timestamp).format("DD-MM-YYYY h:mm:ss")+`</div>`;
+                                    contact +=`</div>`;
+                                    if(dataContact.unreadCount < 0){
+                                        contact +=`<span class="badge bg-success rounded-pill text-success">!</span>`;
+                                    } else if (dataContact.unreadCount >= 1) {
+                                        contact +=`<span class="badge bg-success rounded-pill">`+dataContact.unreadCount+`</span>`;
+                                    }
+                                contact +=`</div>`;
                             contact +=`</div>`;
-                            if(dataContact.unreadCount < 0){
-                                contact +=`<span class="badge bg-success rounded-pill text-success">!</span>`;
-                            } else if (dataContact.unreadCount >= 1) {
-                                contact +=`<span class="badge bg-success rounded-pill">`+dataContact.unreadCount+`</span>`;
-                            }
                             
                         $('.chat').append($('<li class="list-contact list-'+dataContact.id+' '+dataContact.name.toLowerCase()+' list-group-item d-flex justify-content-between align-items-start" data-id="'+dataContact.id+'"></li>')
                         .html(contact));
@@ -239,7 +248,6 @@
                 });
 
                 socket.on('kirim chat sukses', function(data) {
-                    console.log(data);
                     
                     setTimeout(function(){
                         socket.emit('updateDataContact', 'request Data Kontak');
@@ -253,26 +261,24 @@
                 });
 
                 socket.on('chat by number', function(data) {
-                    // console.log(data);
 
                     html = '';
                     for (var i = 0, l = data.length; i < l; i++) {
                         const value = data[i];
-                        // console.log(value);
                         let divClass = value.fromMe == true ? 'chat-to' : 'chat-from';
                         html += '<div class="'+divClass+'"><span>';
-                        
-                        // console.log(value);
-                        // console.log(array);
+
                         if (value.hasMedia) {
-                            // console.log(value);
                             if(getExtByMime(value._data.mimetype) == 'mp4'){
                                 html += '<video width="100%" height="auto" controls><source src="/img/'+ value.id.id + '.'+getExtByMime(value._data.mimetype)+'" type="video/mp4"></span>';
                             } else if(getExtByMime(value._data.mimetype) == 'oga'){
                                 html += '<audio width="100%" height="auto" controls><source src="/img/'+ value.id.id + '.'+getExtByMime(value._data.mimetype)+'" type="video/mp4"></span>';
-                            } else {
+                            } else if(['png', 'jpg', 'jpeg', 'gif','webp'].includes(getExtByMime(value._data.mimetype))){
                                 html += '<img class="img-fluid" src="/img/'+ value.id.id + '.'+getExtByMime(value._data.mimetype)+'" alt="'+ value.id.id + '">';
+                            } else {
+                                html += '<a href="/img/'+ value.id.id + '.'+getExtByMime(value._data.mimetype)+'" alt="'+ value.id.id + '">'+ value.id.id + '</a>';
                             }
+                            
                         } else {
                             html += value.body;
                         }
@@ -283,7 +289,6 @@
                     setTimeout(function() {
                         let tinggiChat = $('#chatarea').height();
                         chatScrollbar.scrollTo(0, tinggiChat, 0, {
-                            // callback: () => console.log(chatScrollbar.offset)
                         });
                     }, 1000);
 
