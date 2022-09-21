@@ -118,7 +118,7 @@ client.on('message', msg => {
     //     if (media) {
     //       // The folder to store: change as you want!
     //       // Create if not exists
-    //       const mediaPath = './public/img-download/';
+    //       const mediaPath = './public/download/';
 
     //       if (!fs.existsSync(mediaPath)) {
     //         fs.mkdirSync(mediaPath);
@@ -185,9 +185,7 @@ io.on('connection', function (socket) {
     });
 
     client.on('message', async function () {
-        let isChatIn = await contactInit();
-        socket.emit('getContact', isChatIn);
-        console.log('sinkronkan kontak karena chat masuk');
+        socket.emit('chatMasuk', 'chat masuk');
     });
 
     socket.on('updateDataContact', async function(msg) {
@@ -222,69 +220,66 @@ io.on('connection', function (socket) {
             });
         }
     });
+
     socket.on('reqPicUrl', async function(data){
         if(client){
             let pic = await client.getProfilePicUrl(data);
-            socket.emit('getPicUrl', [data, pic]);  
+            socket.emit('getPicUrl', {data:data, url:pic});  
         }
     });
-
+   
     socket.on('getchatbyid', async function(msg) {
         const number = phoneNumberFormatter(msg.toString().replace(/[^0-9]/g, '')) || 0;
         const chat = await client.getChatById(number);
-        // console.log(chat.fetchMessages({limit:1}));
-        // console.log('Sukses mendapatkan data chat dari' + number);
         
         chat.fetchMessages({limit:1000}).then(messages => {
             socket.emit('log', 'getchatbyid diterima server');
-            async function loopDulu() {
-                // console.log('mendapatkan chat dari nomor'+number);
-                messages.forEach(getDataChat);
-            };
-    
-            loopDulu().then( () => {
-                socket.emit('chat by number', messages);
+            socket.emit('getChatByNumber', messages);
+
+            // console.log('mendapatkan chat dari nomor'+number);
+            messages.forEach(messages => {
+                let value = messages;
+                if (value.hasMedia) {
+                    value.downloadMedia().then(media => {
+
+                        // To better understanding
+                        // Please look at the console what data we get
+                        // console.log(media);
+                
+                        if (media) {
+                        // The folder to store: change as you want!
+                        // Create if not exists
+                        const mediaPath = './public/download/';
+                
+                        if (!fs.existsSync(mediaPath)) {
+                            fs.mkdirSync(mediaPath, {recursive: true}, err => {});
+                        }
+                
+                        // Get the file extension by mime-type
+                        const extension = mime.extension(media.mimetype);
+                
+                        // Filename: change as you want! 
+                        // I will use the time for this example
+                        // Why not use media.filename? Because the value is not certain exists
+                        const filename = new Date().getTime();
+                
+                        const fullFilename = mediaPath + value.id.id + '.' + extension;
+                        const fileName = value.id.id + '.' + extension;
+                        socket.emit('getMedia', { key: value.mediaKey, name: fileName, ext:extension});
+                        // Save to file
+                        try {
+                            fs.writeFileSync(fullFilename, media.data, { encoding: 'base64' }); 
+                            // console.log('File downloaded successfully! ', fullFilename);
+                        } catch (err) {
+                        //   console.log('Failed to save the file:', err);
+                        }
+                        }
+                    });
+                }
             });
-        })
+        });
     });
 });
-
-const getDataChat = async function (value, index, array) {
-    if (value.hasMedia) {
-        value.downloadMedia().then(media => {
-          // To better understanding
-          // Please look at the console what data we get
-        //   console.log(media);
-  
-          if (media) {
-            // The folder to store: change as you want!
-            // Create if not exists
-            const mediaPath = './public/img-download/';
-  
-            if (!fs.existsSync(mediaPath)) {
-              fs.mkdirSync(mediaPath, {recursive: true}, err => {});
-            }
-  
-            // Get the file extension by mime-type
-            const extension = mime.extension(media.mimetype);
-  
-            // Filename: change as you want! 
-            // I will use the time for this example
-            // Why not use media.filename? Because the value is not certain exists
-            const filename = new Date().getTime();
-  
-            const fullFilename = mediaPath + value.id.id + '.' + extension;
-            // Save to file
-            try {
-                fs.writeFileSync(fullFilename, media.data, { encoding: 'base64' }); 
-                // console.log('File downloaded successfully! ', fullFilename);
-            } catch (err) {
-            //   console.log('Failed to save the file:', err);
-            }
-          }
-        });
-    }
-}
 
 const contactInit = async function () {
     console.log('mendapatkan list chat');

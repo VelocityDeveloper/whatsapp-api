@@ -70,92 +70,6 @@
         });
         // Scrollbar.init(document.querySelector('.fixed-chatform'))
 
-        function getExtByMime(mime) {
-            var mimeToExt = {
-                'image/jpeg': 'jpeg',
-                'image/png': 'png',
-                'image/webp': 'webp',
-                'video/mp4' : 'mp4',
-                'audio/ogg' : 'oga',
-                'audio/ogg; codecs=opus' : 'oga',
-                'audio/aac' : 'aac',
-                'application/x-abiword' : 'abw',
-                'application/x-freearc' : 'arc',
-                'image/avif' : 'avif',
-                'video/x-msvideo' : 'avi',
-                'application/vnd.amazon.ebook' : 'azw',
-                'application/octet-stream' : 'bin',
-                'image/bmp' : 'bmp',
-                'application/x-bzip' : 'bz',
-                'application/x-bzip2' : 'bz2',
-                'application/x-cdf' : 'cda',
-                'application/x-csh' : 'csh',
-                'text/css' : 'css',
-                'text/csv' : 'csv',
-                'application/msword' : 'doc',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'docx',
-                'application/vnd.ms-fontobject' : 'eot',
-                'application/epub+zip' : 'epub',
-                'application/gzip' : 'gz',
-                'image/gif' : 'gif',
-                'text/html' : 'html',
-                'image/vnd.microsoft.icon' : 'ico',
-                'text/calendar' : 'ics',
-                'application/java-archive' : 'jar',
-                'text/javascript' : 'js',
-                'application/json' : 'json',
-                'application/ld+json' : 'jsonld',
-                'audio/midi' : '.midi',
-                'text/javascript' : 'mjs',
-                'audio/mpeg' : 'mp3',
-                'video/mp4' : 'mp4',
-                'video/mpeg' : 'mpeg',
-                'application/vnd.apple.installer+xml' : 'mpkg',
-                'application/vnd.oasis.opendocument.presentation' : 'odp',
-                'application/vnd.oasis.opendocument.spreadsheet' : 'ods',
-                'application/vnd.oasis.opendocument.text' : 'odt',
-                'audio/ogg' : 'oga',
-                'video/ogg' : 'ogv',
-                'application/ogg' : 'ogx',
-                'audio/opus' : 'opus',
-                'font/otf' : 'otf',
-                'image/png' : 'png',
-                'application/pdf' : 'pdf',
-                'application/x-httpd-php' : 'php',
-                'application/vnd.ms-powerpoint' : 'ppt',
-                'application/vnd.openxmlformats-officedocument.presentationml.presentation' : 'pptx',
-                'application/vnd.rar' : 'rar',
-                'application/rtf' : 'rtf',
-                'application/x-sh' : 'sh',
-                'image/svg+xml' : 'svg',
-                'application/x-tar' : 'tar',
-                'image/tiff' : 'tiff',
-                'video/mp2t' : 'ts',
-                'font/ttf' : 'ttf',
-                'text/plain' : 'txt',
-                'application/vnd.visio' : 'vsd',
-                'audio/wav' : 'wav',
-                'audio/webm' : 'weba',
-                'video/webm' : 'webm',
-                'image/webp' : 'webp',
-                'font/woff' : 'woff',
-                'font/woff2' : 'woff2',
-                'application/xhtml+xml' : 'xhtml',
-                'application/vnd.ms-excel' : 'xls',
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'xlsx',
-                'application/xml' : 'xml',
-                'application/vnd.mozilla.xul+xml' : 'xul',
-                'application/zip' : 'zip',
-                'video/3gpp' : '3gp',
-                'video/3gpp2' : '3g2',
-                'application/x-7z-compressed' : '7z',
-            }
-            if (mimeToExt.hasOwnProperty(mime)) {
-                return mimeToExt[mime];
-            }
-            return false;
-        }
-
 		(function($) {
             $(document).ready(function() {
                 const socket = io();
@@ -180,6 +94,9 @@
 
                 // init kontak
                 socket.emit('updateDataContact', 'request Data Kontak');
+                socket.on('chatMasuk', function(msg) {
+                    socket.emit('updateDataContact', 'request Data Kontak karena chat masuk');
+                });
                 if(localNumber){
                     socket.emit('getchatbyid', localNumber);
                 }
@@ -208,12 +125,28 @@
                 });
 
                 socket.on('getPicUrl', function(msg) {
-                    if(msg[1]){
-                        $(`[data-user='`+msg[0]+`']`).attr("src", msg[1]);
+                    if(msg.url){
+                        $(`[data-user='`+msg.data+`']`).attr("src", msg.url);
                     } else {
-                        $(`[data-user='`+msg[0]+`']`).attr("src", '/img/whatsapp.png');
+                        $(`[data-user='`+msg.data+`']`).attr("src", '/img/whatsapp.png');
                     }
-                    
+                });
+
+                socket.on('getMedia', function(msg) {
+                    console.log(msg);
+                    const img =['jpg','jpeg','png','gif','webp'];
+                    const video = ['mp4'];
+                    if(img.includes(msg.ext)){
+                        $('[data-media="'+msg.key+'"]').html('<img src="/download/'+msg.name+'" alt="">');
+                    } else if(video.includes(msg.ext)) {
+                        $('[data-media="'+msg.key+'"]').html(`
+                        <video width="320" controls>
+                        <source src="/download/`+msg.name+`" type="video/mp4">
+                        Your browser does not support the video tag.
+                        </video>`);
+                    }else {
+                        $('[data-media="'+msg.key+'"]').html('<a href="/download/'+msg.name+'">'+msg.name+'</a>');
+                    }
                 });
 
                 socket.on('getContact', function(data) {
@@ -224,11 +157,10 @@
                     var arrayLength = dataListChat.length;
                     for (var i = 0; i < arrayLength; i++) {
                         let dataContact = dataListChat[i]?.data;
-                        console.log(dataContact);
                         socket.emit('reqPicUrl', dataContact.id);
                         //Do something
                         let contact = ``
-                            contact +=`<div class="row">`;
+                            contact +=`<div class="row card-contact">`;
                                 contact +=`<div class="col-2 px-0">`;
                                     contact +=`<img class="rounded-circle img-fluid" data-user="`+dataContact.id+`" src="" alt="">`;
                                 contact +=`</div>`;
@@ -270,8 +202,7 @@
                     
                 });
 
-                socket.on('chat by number', function(data) {
-
+                socket.on('getChatByNumber', function(data) {
                     html = '';
                     for (var i = 0, l = data.length; i < l; i++) {
                         const value = data[i];
@@ -279,20 +210,12 @@
                         html += '<div class="'+divClass+'"><span>';
 
                         if (value.hasMedia) {
-                            if(getExtByMime(value._data.mimetype) == 'mp4'){
-                                html += '<video width="100%" height="auto" controls><source src="/img-download/'+ value.id.id + '.'+getExtByMime(value._data.mimetype)+'" type="video/mp4"></span>';
-                            } else if(getExtByMime(value._data.mimetype) == 'oga'){
-                                html += '<audio width="100%" height="auto" controls><source src="/img-download/'+ value.id.id + '.'+getExtByMime(value._data.mimetype)+'" type="video/mp4"></span>';
-                            } else if(['png', 'jpg', 'jpeg', 'gif','webp'].includes(getExtByMime(value._data.mimetype))){
-                                html += '<img class="img-fluid" src="/img-download/'+ value.id.id + '.'+getExtByMime(value._data.mimetype)+'" alt="'+ value.id.id + '">';
-                            } else {
-                                html += '<a href="/img-download/'+ value.id.id + '.'+getExtByMime(value._data.mimetype)+'" alt="'+ value.id.id + '">'+ value.id.id + '</a>';
-                            }
-                            
+                            // console.log(value);
+                            html += `<div data-media="`+value.mediaKey+`"></div>`;
                         } else {
                             html += value.body;
                         }
-                        html += '<div><small>'+ moment.unix(value.timestamp).format("DD-MM-YYYY h:mm:ss") + "</small></div>";
+                        html += '<div><small style="font-size:8px;">'+ moment.unix(value.timestamp).format("DD-MM-YYYY h:mm:ss") + "</small></div>";
                         html += '</span></div>';
                     }
                     $('.chatarea').html(html);
@@ -301,8 +224,6 @@
                         chatScrollbar.scrollTo(0, tinggiChat, 0, {
                         });
                     }, 1000);
-
-
                 });
 
                 socket.on('qr', function(src) {
