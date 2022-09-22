@@ -29,8 +29,15 @@
                     </div>
                 </div>
                 <div class="col position-relative p-0">
-                    <div class="chat-header">
-                        <img class="rounded-circle img-fluid pic-current" data-user="" src="" alt="">
+                    <div class="chat-header d-flex flex-row align-items-center">
+                        <div class="p-2" >
+                            <img style="width:40px;" class="rounded-circle img-fluid pic-current" data-user="" src="" alt="">
+                        </div>
+                        <div class="p-2">
+                            <span class="current-name">
+
+                            </span>
+                        </div>
                     </div>
                     <div class="area-pesan chat-cols">
                         <div class="chatarea">
@@ -92,6 +99,7 @@
                     socket.emit('getchatbyid', localNomor);
                     socket.emit('reqPicUrl', localId);
                     $('.pic-current').attr('data-user', localId);
+                    $('.current-name').html(localNama);
                 }
 
                 $(document).on("click",".list-contact",function() {
@@ -111,6 +119,7 @@
                     localStorage.setItem('curentchat', JSON.stringify(dataUser));
 
                     $('.pic-current').attr('data-user', id);
+                    $('.current-name').html(nama);
                     $('.chatarea').html('');
                     socket.emit('reqPicUrl', id);
                     $(".kirim-chat .body-message").val('');

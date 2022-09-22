@@ -77,8 +77,11 @@ body {
 .chat-header {
   position:absolute;
   top:0px;
+  background-color: #202C33;
   width: 100%;
   padding: 10px;
+  z-index: 99;
+  color:#ddd;
 }
 ul.logs {
   max-height: 300px;
