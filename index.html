@@ -21,7 +21,7 @@
                 <div class="col-4 col-md-3 p-0 position-relative">
                     <img src="" alt="QR Code" id="qrcode">
                     <div class="search-form">
-                        <input class="form-control" placeholder="Search Contact..">
+                        <input class="form-control rounded-0" placeholder="Search Contact..">
                     </div>
                     
                     <div class="sidebar-chat sidebar-chat area-kontak">
@@ -29,7 +29,9 @@
                     </div>
                 </div>
                 <div class="col position-relative p-0">
-                    
+                    <div class="chat-header">
+                        <img class="rounded-circle img-fluid pic-current" data-user="" src="" alt="">
+                    </div>
                     <div class="area-pesan chat-cols">
                         <div class="chatarea">
 
@@ -73,9 +75,49 @@
 		(function($) {
             $(document).ready(function() {
                 const socket = io();
-                const localNumber = localStorage.getItem('number');
+                const localData = JSON.parse(localStorage.getItem('curentchat'));
+                const localNomor = localData?.nomor;
+                const localId = localData?.id;
+                const localNama = localData?.nama;
 
-                $(document).on("keyup",".search-form",function() {
+                $(".kirim-chat .body-message").attr("placeholder", "Pesan akan dikirim ke "+localNomor);
+
+                // init kontak
+                socket.emit('updateDataContact', 'request Data Kontak');
+                socket.on('chatMasuk', function(msg) {
+                    socket.emit('updateDataContact', 'request Data Kontak karena chat masuk');
+                });
+
+                if(localNomor && localId){
+                    socket.emit('getchatbyid', localNomor);
+                    socket.emit('reqPicUrl', localId);
+                    $('.pic-current').attr('data-user', localId);
+                }
+
+                $(document).on("click",".list-contact",function() {
+                    $('.list-contact').removeClass('active');
+                    $( this ).addClass('active');
+                    let nomor = $( this ).data('nomor');
+                    let id = $( this ).data('id');
+                    let nama = $( this ).data('nama');
+                    let dataUser = {
+                        'id': id,
+                        'nomor': nomor,
+                        'nama' : nama
+                    };
+
+                    // getchatbyid
+                    socket.emit('getchatbyid', nomor);
+                    localStorage.setItem('curentchat', JSON.stringify(dataUser));
+
+                    $('.pic-current').attr('data-user', id);
+                    $('.chatarea').html('');
+                    socket.emit('reqPicUrl', id);
+                    $(".kirim-chat .body-message").val('');
+                    $(".kirim-chat .body-message").attr("placeholder", "Pesan akan dikirim ke "+nama);
+                });
+
+                $(document).on("keyup",".search-form input",function() {
                     var value = $(this).val();
                     $('.list-contact').removeClass('d-none');
                     var filter = $(this).val().toLowerCase(); // get the value of the input, which we filter on
@@ -86,36 +128,12 @@
                                 $(this).removeClass('d-none');
                             }
                         });
-                        
                     }
                 });
 
-                $(".kirim-chat .body-message").attr("placeholder", "Pesan akan dikirim ke "+localNumber);
-
-                // init kontak
-                socket.emit('updateDataContact', 'request Data Kontak');
-                socket.on('chatMasuk', function(msg) {
-                    socket.emit('updateDataContact', 'request Data Kontak karena chat masuk');
-                });
-                if(localNumber){
-                    socket.emit('getchatbyid', localNumber);
-                }
-                $(document).on("click",".list-contact",function() {
-                    $('.list-contact').removeClass('active');
-                    $( this ).addClass('active');
-                    let id = $( this ).data('id');
-                    // getchatbyid
-                    socket.emit('getchatbyid', id);
-                    localStorage.setItem('number', id);
-                    $(".kirim-chat .body-message").val('');
-                    $(".kirim-chat .body-message").attr("placeholder", "Pesan akan dikirim ke "+id);
-                });
-
-
                 $( ".kirim-chat" ).submit(function( event ) {                   
                     let message = $(this).find(".body-message").val();
-                    let localNumber =localStorage.getItem('number'); 
-                    socket.emit('sentMessage', {'nomor':localNumber,'message':message});
+                    socket.emit('sentMessage', {'nomor':localNomor,'message':message});
                     $(".kirim-chat .body-message").val('');
                     event.preventDefault();
                 });
@@ -133,7 +151,6 @@
                 });
 
                 socket.on('getMedia', function(msg) {
-                    console.log(msg);
                     const img =['jpg','jpeg','png','gif','webp'];
                     const video = ['mp4'];
                     if(img.includes(msg.ext)){
@@ -150,43 +167,45 @@
                 });
 
                 socket.on('getContact', function(data) {
-                    $('.chat').html('');
-                    const dataListChat = data.sort();
-                    // dataListChat.sort((a, b));
+                    if(data){
+                        $('.chat').html('');
+                        const dataListChat = data.sort();
+                        // dataListChat.sort((a, b));
 
-                    var arrayLength = dataListChat.length;
-                    for (var i = 0; i < arrayLength; i++) {
-                        let dataContact = dataListChat[i]?.data;
-                        socket.emit('reqPicUrl', dataContact.id);
-                        //Do something
-                        let contact = ``
-                            contact +=`<div class="row card-contact">`;
-                                contact +=`<div class="col-2 px-0">`;
-                                    contact +=`<img class="rounded-circle img-fluid" data-user="`+dataContact.id+`" src="" alt="">`;
-                                contact +=`</div>`;
-                                contact +=`<div class="col-10">`;
-                                    contact +=`<div class="ms-2 me-auto">
-                                    <div class="data-nama">`+dataContact.name+`</div>`;
-                                    contact +=`<div style="font-size:8px;">`+moment.unix(dataContact.timestamp).format("DD-MM-YYYY h:mm:ss")+`</div>`;
+                        var arrayLength = dataListChat.length;
+                        for (var i = 0; i < arrayLength; i++) {
+                            let dataContact = dataListChat[i]?.data;
+                            socket.emit('reqPicUrl', dataContact.id);
+                            //Do something
+                            let contact = ``
+                                contact +=`<div class="row card-contact">`;
+                                    contact +=`<div class="col-2 px-0">`;
+                                        contact +=`<img class="rounded-circle img-fluid" data-user="`+dataContact.id+`" src="" alt="">`;
                                     contact +=`</div>`;
-                                    if(dataContact.unreadCount < 0){
-                                        contact +=`<span class="badge bg-success rounded-pill text-success">!</span>`;
-                                    } else if (dataContact.unreadCount >= 1) {
-                                        contact +=`<span class="badge bg-success rounded-pill">`+dataContact.unreadCount+`</span>`;
-                                    }
+                                    contact +=`<div class="col-10">`;
+                                        contact +=`<div class="ms-2 me-auto">
+                                        <div class="data-nama">`+dataContact.name+`</div>`;
+                                        contact +=`<div style="font-size:8px;">`+moment.unix(dataContact.timestamp).format("DD-MM-YYYY h:mm:ss")+`</div>`;
+                                        contact +=`</div>`;
+                                        if(dataContact.unreadCount < 0){
+                                            contact +=`<span class="badge bg-success rounded-pill text-success">!</span>`;
+                                        } else if (dataContact.unreadCount >= 1) {
+                                            contact +=`<span class="badge bg-success rounded-pill">`+dataContact.unreadCount+`</span>`;
+                                        }
+                                    contact +=`</div>`;
                                 contact +=`</div>`;
-                            contact +=`</div>`;
-                            
-                        $('.chat').append($('<li class="text-white bg-dark list-contact list-'+dataContact.nomor+' '+dataContact.name.toLowerCase()+' list-group-item align-start" data-id="'+dataContact.nomor+'"></li>')
-                        .html(contact));
-                    }
-                    if(localNumber){
-                        $('.list-'+localNumber).addClass( "active" );
+                                
+                            $('.chat').append($('<li class="text-white bg-dark list-contact list-'+dataContact.nomor+' '+dataContact.name.toLowerCase()+' list-group-item align-start" data-id="'+dataContact.id+'" data-nomor="'+dataContact.nomor+'" data-nama="'+dataContact.name+'"></li>')
+                            .html(contact));
+                        }
+                        if(localNomor){
+                            $('.list-'+localNomor).addClass( "active" );
+                        }
                     }
                 });
 
                 socket.on('chatmasuk', function(data) {
-                    socket.emit('getchatbyid', localNumber);
+                    socket.emit('getchatbyid', localNomor);
                 });
 
                 socket.on('kirim chat sukses', function(data) {
@@ -195,8 +214,8 @@
                         socket.emit('updateDataContact', 'request Data Kontak');
                     }, 100);
 
-                    if(localNumber == data) {
-                        socket.emit('getchatbyid', localNumber);
+                    if(localNomor == data) {
+                        socket.emit('getchatbyid', localNomor);
                         $(".body-message").val('');
                     }
                     
@@ -210,7 +229,6 @@
                         html += '<div class="'+divClass+'"><span>';
 
                         if (value.hasMedia) {
-                            // console.log(value);
                             html += `<div data-media="`+value.mediaKey+`"></div>`;
                         } else {
                             html += value.body;

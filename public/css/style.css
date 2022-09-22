@@ -16,7 +16,10 @@ body {
 }
 .card-contact {
   position:relative;
-  color: #ddd;
+  color: #d1d1d1;
+}
+.pic-current {
+  width:90px;
 }
 .card-contact .badge {
   position: absolute;
@@ -43,7 +46,7 @@ body {
 }
 .chat-from,
 .chat-to {
-  color: rgb(230, 230, 230);
+  color: rgb(191 191 191);
   padding: 10px 0;
 }
 .chat-from {
@@ -55,7 +58,7 @@ body {
 .chat-from span,
 .chat-to span {
   padding: 10px;
-  border-radius: 20px;
+  border-radius: 7px;
   display: inline-block;
   max-width:80%;
   overflow-wrap: anywhere;
@@ -66,11 +69,16 @@ body {
   max-width:300px;
 }
 .chat-from span {
-  background-color: rgb(62, 142, 218);
+  background-color: #202C33;
 }
 .chat-to span {
-  background-color: rgb(175, 86, 216);
-
+  background-color: #172026;
+}
+.chat-header {
+  position:absolute;
+  top:0px;
+  width: 100%;
+  padding: 10px;
 }
 ul.logs {
   max-height: 300px;
