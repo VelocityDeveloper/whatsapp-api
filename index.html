@@ -46,8 +46,7 @@
                     </div>
                     <div class="fixed-chatform bg-dark">
                         <form class="kirim-chat">
-                            <textarea class="body-message form-control mb-2" placeholder=""></textarea>
-                            <button class="btn btn-success ms-auto me-0">Kirim</button>
+                            <textarea class="body-message form-control mb-2" placeholder="" row="1"></textarea>
                         </form>
                     </div>
                     <ul class="list-group logs d-none">
@@ -101,7 +100,12 @@
                     $('.pic-current').attr('data-user', localId);
                     $('.current-name').html(localNama);
                 }
-
+                $(".body-message").keypress(function (e) {
+                    if(e.which == 13) {
+                        $('.kirim-chat').submit();
+                        e.preventDefault();
+                    }
+                });
                 $(document).on("click",".list-contact",function() {
                     $('.list-contact').removeClass('active');
                     $( this ).addClass('active');
