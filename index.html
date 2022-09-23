@@ -28,26 +28,45 @@
                         <ul class="list-group chat pb-5"></ul>
                     </div>
                 </div>
-                <div class="col position-relative p-0">
+                <div class="col position-relative p-0 height-100vh">
                     <div class="chat-header d-flex flex-row align-items-center">
                         <div class="p-2" >
                             <img style="width:40px;" class="rounded-circle img-fluid pic-current" data-user="" src="" alt="">
                         </div>
                         <div class="p-2">
                             <span class="current-name">
-
                             </span>
                         </div>
                     </div>
                     <div class="area-pesan chat-cols">
                         <div class="chatarea">
-
                         </div>
                     </div>
                     <div class="fixed-chatform bg-dark">
+
                         <form class="kirim-chat">
-                            <textarea class="body-message form-control mb-2" placeholder="" row="1"></textarea>
+                            <div class="row mx-0">
+                                <div class="col-10">
+                                    <label for="lampiran" class="blue-100 lampiran">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-paperclip" viewBox="0 0 16 16">
+                                            <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
+                                        </svg>
+                                    </label>
+                                    <input id="lapiran" type="file" class=" form-control d-none" >
+                                    <textarea class="body-message form-control" placeholder="" rows="1"></textarea>
+                                </div>
+                                <div class="col-2">
+                                    <button class="btn btn-dark">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
+                                            <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+
+                            </div>
                         </form>
+
+                        
                     </div>
                     <ul class="list-group logs d-none">
                     </ul>
@@ -188,7 +207,7 @@
                         Your browser does not support the video tag.
                         </audio>`);
                     } else {
-                        $('[data-media="'+msg.key+'"]').html('<a class="btn btn-dark" href="/download/'+msg.name+'">'+downloadicon+' '+msg.name+'</a>');
+                        $('[data-media="'+msg.key+'"]').html('<a class="btn btn-dark" href="/download/'+msg.name+'" download>'+downloadicon+' '+msg.name+'</a>');
                     }
                 });
 

@@ -105,8 +105,26 @@ ul.logs li:first-child {
   margin: 0;
   overflow: hidden;
 }
+.kirim-chat {
+  position: relative;
+}
+.lampiran {
+  position: absolute;
+  color: white;
+  background-color: #2f9b58;
+  padding: 10px;
+  height: 40px;
+  width: 40px;
+  border-radius: 20px;
+  text-align: center;
+  left: 0px;
+  top:-1px;
+}
+.height-100vh {
+  height: 100vh;
+}
 .area-pesan {
-  height: calc(100vh - 165px);
+  height: calc(100vh - 133px);
   overflow-y: auto;
   background-color: #222;
   display: flex;
@@ -116,7 +134,6 @@ ul.logs li:first-child {
 }
 .fixed-chatform {
     padding:10px;
-    margin-top: 2vh;
     position: absolute;
     bottom: 0px;
     width: 100%;
