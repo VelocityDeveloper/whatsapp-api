@@ -108,6 +108,11 @@ ul.logs li:first-child {
 .kirim-chat {
   position: relative;
 }
+.lampiran svg {
+  position: relative;
+  left: -5px;
+  top: -4px;
+}
 .lampiran {
   position: absolute;
   color: white;
