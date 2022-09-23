@@ -142,7 +142,11 @@
                     }
                 });
 
-                $( ".kirim-chat" ).submit(function( event ) {                   
+                $( ".kirim-chat" ).submit(function( event ) {       
+                    const localData = JSON.parse(localStorage.getItem('curentchat'));
+                    const localNomor = localData?.nomor;
+                    const localId = localData?.id;
+                    const localNama = localData?.nama;
                     let message = $(this).find(".body-message").val();
                     socket.emit('sentMessage', {'nomor':localNomor,'message':message});
                     $(".kirim-chat .body-message").val('');
