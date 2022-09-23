@@ -106,6 +106,7 @@
                 });
                 $(document).on("click",".list-contact",function() {
                     $('.list-contact').removeClass('active');
+                    $(".kirim-chat .body-message").val('');
                     $( this ).addClass('active');
                     let nomor = $( this ).data('nomor');
                     let id = $( this ).data('id');
@@ -115,16 +116,16 @@
                         'nomor': nomor,
                         'nama' : nama
                     };
+                    localStorage.setItem('curentchat', JSON.stringify(dataUser));
 
                     // getchatbyid
                     socket.emit('getchatbyid', nomor);
-                    localStorage.setItem('curentchat', JSON.stringify(dataUser));
 
                     $('.pic-current').attr('data-user', id);
                     $('.current-name').html(nama);
                     $('.chatarea').html('');
                     socket.emit('reqPicUrl', id);
-                    $(".kirim-chat .body-message").val('');
+                    
                 });
 
                 $(document).on("keyup",".search-form input",function() {
@@ -225,25 +226,15 @@
                     }
                 });
 
-                socket.on('chatmasuk', function(data) {
-                    // socket.emit('getchatbyid', localNomor);
-                });
-
-                socket.on('kirim chat sukses', function(data) {
-                    
-                    setTimeout(function(){
-                        socket.emit('updateDataContact', 'request Data Kontak');
-                    }, 100);
-
-                    if(localNomor == data) {
-                        // socket.emit('getchatbyid', localNomor);
-                        $(".body-message").val('');
-                    }
-                    
+                socket.on('sentMessageSuccess', function(data) {
+                    $(".body-message").val('');
                 });
 
                 socket.on('getChatByNumber', function(data) {
-                    console.log(data);
+                    const localData = JSON.parse(localStorage.getItem('curentchat'));
+                    const localNomor = localData?.nomor;
+                    const localId = localData?.id;
+                    const localNama = localData?.nama;
                     let html = '';
                     if( [data.from , data.to].includes(localId) ){
                         const value = data;

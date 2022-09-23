@@ -185,7 +185,6 @@ io.on('connection', function (socket) {
     });
 
     client.on('message', async function (message) {
-        socket.emit('chatMasuk', 'chat masuk');
         socket.emit('getChatByNumber', message);
         let value = message;
         if (value.hasMedia) {
@@ -289,7 +288,7 @@ io.on('connection', function (socket) {
                         }
                     });
                 }
-                socket.emit('kirim chat sukses', data.nomor);  
+                socket.emit('sentMessageSuccess', data.nomor);  
             }).catch(err => {
                 socket.emit('log', err);
             });
