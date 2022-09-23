@@ -187,8 +187,9 @@ io.on('connection', function (socket) {
     client.on('message', async function (message) {
         socket.emit('chatMasuk', 'chat masuk');
         socket.emit('getChatByNumber', message);
-        if (message.hasMedia) {
-            message.downloadMedia().then(media => {
+        let value = message;
+        if (value.hasMedia) {
+            value.downloadMedia().then(media => {
 
                 // To better understanding
                 // Please look at the console what data we get
