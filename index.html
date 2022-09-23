@@ -72,10 +72,10 @@
 
         Scrollbar.init(document.querySelector('.area-kontak'));
         // Scrollbar.init(document.querySelector('.area-pesan'),options);
-        const chatScrollbar = Scrollbar.init(document.querySelector('.area-pesan'), {
-        damping: 0.2,
-        alwaysShowTracks : true
-        });
+        // const chatScrollbar = Scrollbar.init(document.querySelector('.area-pesan'), {
+        // damping: 0.2,
+        // alwaysShowTracks : true
+        // });
         // Scrollbar.init(document.querySelector('.fixed-chatform'))
 
 		(function($) {
@@ -85,8 +85,6 @@
                 const localNomor = localData?.nomor;
                 const localId = localData?.id;
                 const localNama = localData?.nama;
-
-                $(".kirim-chat .body-message").attr("placeholder", "Pesan akan dikirim ke "+localNomor);
 
                 // init kontak
                 socket.emit('updateDataContact', 'request Data Kontak');
@@ -127,7 +125,6 @@
                     $('.chatarea').html('');
                     socket.emit('reqPicUrl', id);
                     $(".kirim-chat .body-message").val('');
-                    $(".kirim-chat .body-message").attr("placeholder", "Pesan akan dikirim ke "+nama);
                 });
 
                 $(document).on("keyup",".search-form input",function() {
@@ -164,8 +161,13 @@
                 });
 
                 socket.on('getMedia', function(msg) {
+                    const downloadicon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud-arrow-down-fill" viewBox="0 0 16 16">
+                                            <path d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2zm2.354 6.854-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 9.293V5.5a.5.5 0 0 1 1 0v3.793l1.146-1.147a.5.5 0 0 1 .708.708z"/>
+                                            </svg>`;
                     const img =['jpg','jpeg','png','gif','webp'];
+                    const audio =['ogg','mp3','oga'];
                     const video = ['mp4'];
+                    console.log(msg);
                     if(img.includes(msg.ext)){
                         $('[data-media="'+msg.key+'"]').html('<img src="/download/'+msg.name+'" alt="">');
                     } else if(video.includes(msg.ext)) {
@@ -174,8 +176,14 @@
                         <source src="/download/`+msg.name+`" type="video/mp4">
                         Your browser does not support the video tag.
                         </video>`);
-                    }else {
-                        $('[data-media="'+msg.key+'"]').html('<a href="/download/'+msg.name+'">'+msg.name+'</a>');
+                    } else if(audio.includes(msg.ext)) {
+                        $('[data-media="'+msg.key+'"]').html(`
+                        <audio controls>
+                        <source src="/download/`+msg.name+`" type="video/mp4">
+                        Your browser does not support the video tag.
+                        </audio>`);
+                    } else {
+                        $('[data-media="'+msg.key+'"]').html('<a class="btn btn-dark" href="/download/'+msg.name+'">'+downloadicon+' '+msg.name+'</a>');
                     }
                 });
 
@@ -192,14 +200,14 @@
                             //Do something
                             let contact = ``
                                 contact +=`<div class="row card-contact">`;
-                                    contact +=`<div class="col-2 px-0">`;
-                                        contact +=`<img class="rounded-circle img-fluid" data-user="`+dataContact.id+`" src="" alt="">`;
-                                    contact +=`</div>`;
-                                    contact +=`<div class="col-10">`;
-                                        contact +=`<div class="ms-2 me-auto">
-                                        <div class="data-nama">`+dataContact.name+`</div>`;
-                                        contact +=`<div style="font-size:8px;">`+moment.unix(dataContact.timestamp).format("DD-MM-YYYY h:mm:ss")+`</div>`;
-                                        contact +=`</div>`;
+                                    contact +=`<div class="col-2 px-0">
+                                            <img class="rounded-circle img-fluid" data-user="`+dataContact.id+`" src="" alt="">
+                                            </div>
+                                            <div class="col-10">
+                                            <div class="ms-2 me-auto">
+                                            <div class="data-nama">`+dataContact.name+`</div>
+                                            <div style="font-size:8px;">`+moment.unix(dataContact.timestamp).format("DD-MM-YYYY h:mm:ss")+`</div>
+                                        </div>`;
                                         if(dataContact.unreadCount < 0){
                                             contact +=`<span class="badge bg-success rounded-pill text-success">!</span>`;
                                         } else if (dataContact.unreadCount >= 1) {
@@ -218,7 +226,7 @@
                 });
 
                 socket.on('chatmasuk', function(data) {
-                    socket.emit('getchatbyid', localNomor);
+                    // socket.emit('getchatbyid', localNomor);
                 });
 
                 socket.on('kirim chat sukses', function(data) {
@@ -228,16 +236,17 @@
                     }, 100);
 
                     if(localNomor == data) {
-                        socket.emit('getchatbyid', localNomor);
+                        // socket.emit('getchatbyid', localNomor);
                         $(".body-message").val('');
                     }
                     
                 });
 
                 socket.on('getChatByNumber', function(data) {
-                    html = '';
-                    for (var i = 0, l = data.length; i < l; i++) {
-                        const value = data[i];
+                    console.log(data);
+                    let html = '';
+                    if( [data.from , data.to].includes(localId) ){
+                        const value = data;
                         let divClass = value.fromMe == true ? 'chat-to' : 'chat-from';
                         html += '<div class="'+divClass+'"><span>';
 
@@ -246,15 +255,17 @@
                         } else {
                             html += value.body;
                         }
+
                         html += '<div><small style="font-size:8px;">'+ moment.unix(value.timestamp).format("DD-MM-YYYY h:mm:ss") + "</small></div>";
                         html += '</span></div>';
+                        $(".chatarea").append(html);
                     }
-                    $('.chatarea').html(html);
-                    setTimeout(function() {
-                        let tinggiChat = $('.chatarea').height();
-                        chatScrollbar.scrollTo(0, tinggiChat, 0, {
-                        });
-                    }, 1000);
+
+                    // setTimeout(function() {
+                    //     let tinggiChat = $('.chatarea').height();
+                    //     chatScrollbar.scrollTo(0, tinggiChat, 0, {
+                    //     });
+                    // }, 1000);
                 });
 
                 socket.on('qr', function(src) {

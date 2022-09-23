@@ -110,6 +110,8 @@ ul.logs li:first-child {
     overflow-y: auto;
     background-color: #222;
     border-radius: 10px;
+    display: flex;
+    flex-direction: column-reverse;
 }
 .fixed-chatform {
     padding:10px;
